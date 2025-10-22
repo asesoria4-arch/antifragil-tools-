@@ -214,4 +214,17 @@ c1, c2, c3 = st.columns(3)
 mv = get_merval()
 if mv:
     val_fmt = f"{mv['last']:,.0f}".replace(",", ".")
-    sub = f"Δ día: {mv['var_d'_]()
+    sub = f"Δ día: {mv['var_d']:+.1f}% • Δ mes: {mv['var_m']:+.1f}%"
+    with c1: metric("MERVAL (ARS)", val_fmt, sub)
+    fx_ccl = requests.get("https://dolarapi.com/v1/dolares").json()
+    ccl_val = next((float(x["venta"]) for x in fx_ccl if x["nombre"].lower()=="contadoconliqui"), None)
+    if ccl_val:
+        with c2: metric("MERVAL (USD CCL)", f"{mv['last']/ccl_val:,.2f}".replace(",", "."))
+rp = get_riesgo_pais()
+with c3: metric("Riesgo País (EMBI+ AR)", f"{rp:,}".replace(",", ".") if rp else "No disponible")
+
+# FOOTER
+st.markdown(f"""
+<hr>
+<p class='caption'>Actualizado: {now_str()} • Dólar: dolarapi.com • BCRA: api.bcra.gob.ar • MERVAL: Yahoo Finance • Riesgo País: Ámbito</p>
+""", unsafe_allow_html=True)
